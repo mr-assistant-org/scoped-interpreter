@@ -8,9 +8,9 @@ import ast.Statement
 import ast.VarDef
 import ast.VarExpr
 import lexer.Lexer
-import lexer.Term.*
+import lexer.Terminal.*
 
-class Parser(input: String) { // TODO Replace String with Stream
+class Parser(input: CharSequence) {
     private val lexer: Lexer = Lexer(input)
     init {
         lexer.nextToken()
@@ -18,19 +18,13 @@ class Parser(input: String) { // TODO Replace String with Stream
 
     fun expression(): Expression {
         return when (lexer.curTerminal.terminal) {
-            INT -> {
-                NumberExpr(lexer.curTerminal.value.toInt()).also {
-                    lexer.nextToken()
-                }
+            INT -> NumberExpr(lexer.curTerminal.value.toInt()).also {
+                lexer.nextToken()
             }
-            VAR -> {
-                VarExpr(lexer.curTerminal.value.toString()).also {
-                    lexer.nextToken()
-                }
+            VAR -> VarExpr(lexer.curTerminal.value.toString()).also {
+                lexer.nextToken()
             }
-            else -> {
-                throw ParserException("Invalid terminal ${lexer.curTerminal}", lexer.curPos)
-            }
+            else -> throw ParserException("Invalid terminal ${lexer.curTerminal}", lexer.curPos)
         }
     }
 
@@ -41,14 +35,11 @@ class Parser(input: String) { // TODO Replace String with Stream
                 lexer.nextToken()
 
                 lexer.expect(EQUAL)
-                lexer.nextToken()
 
                 val value = expression()
                 VarDef(name, value)
             }
-            else -> {
-                throw ParserException("Invalid terminal ${lexer.curTerminal}", lexer.curPos)
-            }
+            else -> throw ParserException("Invalid terminal ${lexer.curTerminal}", lexer.curPos)
         }
     }
 
@@ -59,9 +50,7 @@ class Parser(input: String) { // TODO Replace String with Stream
                 val value = expression()
                 Print(value)
             }
-            else -> {
-                throw ParserException("Invalid terminal ${lexer.curTerminal}", lexer.curPos)
-            }
+            else -> throw ParserException("Invalid terminal ${lexer.curTerminal}", lexer.curPos)
         }
     }
 
@@ -70,10 +59,8 @@ class Parser(input: String) { // TODO Replace String with Stream
             SCOPE -> {
                 lexer.nextToken()
                 lexer.expect(LBRACKET)
-                lexer.nextToken()
                 Scope(statements()).also {
                     lexer.expect(RBRACKET)
-                    lexer.nextToken()
                 }
             }
             else -> throw ParserException("Invalid terminal ${lexer.curTerminal}", lexer.curPos)
@@ -91,10 +78,7 @@ class Parser(input: String) { // TODO Replace String with Stream
 
     fun statements(): List<Statement> {
         return when (lexer.curTerminal.terminal) {
-            in listOf(VAR, PRINT, SCOPE) -> {
-                val element = statement()
-                listOf(element) + statements()
-            }
+            in listOf(VAR, PRINT, SCOPE) -> listOf(statement()) + statements()
             in listOf(END, RBRACKET) -> listOf()
             else -> throw ParserException("Invalid terminal ${lexer.curTerminal}", lexer.curPos)
         }

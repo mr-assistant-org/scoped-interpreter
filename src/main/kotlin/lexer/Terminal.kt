@@ -1,6 +1,6 @@
 package lexer
 
-enum class Term(val pattern: Regex? = null) {
+enum class Terminal(val pattern: Regex? = null) {
     PRINT(keyword("print")),
     SCOPE(keyword("scope")),
     EQUAL("=".toRegex()),
@@ -15,4 +15,4 @@ enum class Term(val pattern: Regex? = null) {
 
 private fun keyword(keyword: String): Regex = "$keyword[^A-Za-z_0-9]".toRegex()
 
-data class TermWithValue(val terminal: Term, val value: String)
+data class TermWithValue(val terminal: Terminal, val value: String)

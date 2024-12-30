@@ -1,6 +1,6 @@
 package lexer
 
-import lexer.Term.*
+import lexer.Terminal.*
 
 open class Lexer(private val input: CharSequence) {
     var curPos = 0
@@ -14,29 +14,32 @@ open class Lexer(private val input: CharSequence) {
             curTerminal = TermWithValue(END, "")
             return
         }
-        Term.entries.forEach { rule ->
+        Terminal.entries.forEach { rule ->
             val match = rule.pattern?.matchAt(input, curPos) ?: return@forEach
             curPos += match.range.length()
             curTerminal = TermWithValue(rule, match.value)
             skipWhitespaces()
             return
         }
-        throw LexerException(
-            "Unknown token starting from `${input.subSequence(curPos, minOf(curPos + 10, input.length))}...`", curPos
-        )
+        throw LexerException("Unknown token starting from `${currentPrefix()}...`", curPos)
     }
 
-    fun expect(terminal: Term) {
+    fun expect(terminal: Terminal) {
         if (terminal != curTerminal.terminal) {
             throw LexerException(
-                "Invalid terminal. Expected terminal with `$terminal`, actual `${curTerminal.terminal}`", curPos
+                "Invalid terminal. Expected terminal `$terminal`, " +
+                        "actual `${curTerminal.terminal}` starting from `${currentPrefix()}...`", curPos
             )
         }
+        nextToken()
     }
 
-    fun skipWhitespaces() {
+    private fun skipWhitespaces() {
         while (curTerminal.terminal == WS) nextToken()
     }
+
+    private fun currentPrefix(length: Int = 15): CharSequence =
+        input.subSequence(curPos, minOf(curPos + length, input.length))
 
     private fun IntRange.length() = last - first + 1
 }
