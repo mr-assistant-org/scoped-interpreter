@@ -1,3 +1,4 @@
+import Scoped.Companion.scoped
 import ast.Statement
 import parser.Parser
 import kotlin.test.Test
