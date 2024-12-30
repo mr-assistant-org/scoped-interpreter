@@ -30,7 +30,7 @@ WS -> '[ \t\r\n]+'
 
 Whitespaces described by `WS` terminal are consumed implicitly after each terminal. Start non-terminal is `stmts`.
 
-It is easy to prove formally that this grammar is LL(1). It means that pretty much every approach to parsing such language will work.
+It is easy to prove formally that this grammar is LL(1). It means that pretty much every approach to parsing such language will work, and will be quite fast (O(n) time complexity).
 
 I reviewed 3 options for parser:
 1. Usage of parser generator like ANTLR
