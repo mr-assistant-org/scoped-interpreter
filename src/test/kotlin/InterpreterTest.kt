@@ -1,5 +1,6 @@
 import Scoped.Companion.scoped
 import ast.Scope
+import ast.Statement
 import interpreter.Evaluator
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -34,12 +35,11 @@ class InterpreterTest {
             1
             
         """.trimIndent()
-        val actual = Evaluator().interpret(Scope(input))
-        assertEquals(expected, actual)
+        makeTest(input, expected)
     }
 
     @Test
-    fun `initialized variables are null`() {
+    fun `uninitialized variables are null`() {
         val input = scoped {
             "x" -= "x"
             print("x")
@@ -53,8 +53,7 @@ class InterpreterTest {
             null
             
         """.trimIndent()
-        val actual = Evaluator().interpret(Scope(input))
-        assertEquals(expected, actual)
+        makeTest(input, expected)
     }
 
     @Test
@@ -80,7 +79,11 @@ class InterpreterTest {
             null
             
         """.trimIndent()
-        val actual = Evaluator().interpret(Scope(input))
+        makeTest(input, expected)
+    }
+
+    private fun makeTest(input: MutableList<Statement>, expected: String) {
+        val actual = Evaluator().interpret(input)
         assertEquals(expected, actual)
     }
 }

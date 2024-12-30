@@ -78,7 +78,13 @@ class Parser(input: CharSequence) {
 
     fun statements(): List<Statement> {
         return when (lexer.curTerminal.terminal) {
-            in listOf(VAR, PRINT, SCOPE) -> listOf(statement()) + statements()
+            in listOf(VAR, PRINT, SCOPE) -> {
+                val statements = mutableListOf<Statement>()
+                while (lexer.curTerminal.terminal in listOf(VAR, PRINT, SCOPE)) {
+                    statements.add(statement())
+                }
+                statements
+            }
             in listOf(END, RBRACKET) -> listOf()
             else -> throw ParserException("Invalid terminal ${lexer.curTerminal}", lexer.curPos)
         }
