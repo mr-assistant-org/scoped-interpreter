@@ -1,35 +1,18 @@
-import ast.NumberExpr
-import ast.Print
-import ast.Scope
-import ast.VarExpr
-import ast.VarDef
+import ast.Statement
 import parser.Parser
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class CommonTests {
-    @Test
-    fun testPrint() {
-        val example = Scope(
-            listOf(
-                VarDef("x", NumberExpr(1)),
-                Print(VarExpr("x")),
-                Scope(listOf(
-                    VarDef("x", NumberExpr(2)),
-                    Print(VarExpr("x")),
-                ))
-            )
-        )
-        println(example)
-    }
-
+class ParserTest {
     @Test
     fun varDef() {
         val input = """
             x = 2
         """.trimIndent()
-        val parser = Parser(input)
-        println(parser.statements())
+        val expected = scoped {
+            "x" -= 2
+        }
+        makeTest(input, expected)
     }
 
     @Test
@@ -37,8 +20,10 @@ class CommonTests {
         val input = """
             print x
         """.trimIndent()
-        val parser = Parser(input)
-        println(parser.statements())
+        val expected = scoped {
+            print("x")
+        }
+        makeTest(input, expected)
     }
 
     @Test
@@ -46,19 +31,25 @@ class CommonTests {
         val input = """
             print 2
         """.trimIndent()
-        val parser = Parser(input)
-        println(parser.statements())
+        val expected = scoped {
+            print(2)
+        }
+        makeTest(input, expected)
     }
 
     @Test
-    fun several() {
+    fun severalStatements() {
         val input = """
             print 1
             x = 2
             print x
         """.trimIndent()
-        val parser = Parser(input)
-        println(parser.statements())
+        val expected = scoped {
+            print(1)
+            "x" -= 2
+            print("x")
+        }
+        makeTest(input, expected)
     }
 
     @Test
@@ -69,33 +60,58 @@ class CommonTests {
                 print 2
             }
         """.trimIndent()
-        val parser = Parser(input)
-        println(parser.statements())
+        val expected = scoped {
+            scope {
+                print("x")
+                print(2)
+            }
+        }
+        makeTest(input, expected)
     }
 
     @Test
     fun nestedScopes() {
         val input = """
-            x = 2
+            x = 1
             scope {
-                z = 3
-                print 2
+                x = 2
                 scope {
-                    print z
-                }
-                y = 5
-                scope {
-                    print y
+                    x = 3
                     scope {
-                        print x
+                        x = 4
+                    }
+                }
+                scope {
+                    x = 5
+                    scope {
+                        x = 6
                     }
                 }
                 print x
-                print 2
             }
+            print x
         """.trimIndent()
-        val parser = Parser(input)
-        println(parser.statements())
+        val expected = scoped {
+            "x" -= 1
+            scope {
+                "x" -= 2
+                scope {
+                    "x" -= 3
+                    scope {
+                        "x" -= 4
+                    }
+                }
+                scope {
+                    "x" -= 5
+                    scope {
+                        "x" -= 6
+                    }
+                }
+                print("x")
+            }
+            print("x")
+        }
+        makeTest(input, expected)
     }
 
     @Test
@@ -117,8 +133,6 @@ class CommonTests {
             }
             print x
         """.trimIndent()
-        val parser = Parser(input)
-        val actual = parser.statements()
         val expected = scoped {
             "x" -= 1
             print("x")
@@ -136,28 +150,36 @@ class CommonTests {
             }
             print("x")
         }
-        assertEquals(expected, actual)
+        makeTest(input, expected)
     }
 
     @Test
     fun variableNames() {
         val input = """
             xxx = 1
-            jjadsjio = 3
+            jjads_jio = 2
             jJD12 = 3
             zprint = 4
             sscope = 5
+            scopeL = 2
+            println = 2
         """.trimIndent()
-        val parser = Parser(input)
-        println(parser.statements())
+        val expected = scoped {
+            "xxx" -= 1
+            "jjads_jio" -= 2
+            "jJD12" -= 3
+            "zprint" -= 4
+            "sscope" -= 5
+            "scopeL" -= 2
+            "println" -= 2
+        }
+        makeTest(input, expected)
     }
 
-    @Test
-    fun problem() {
-        val input = """
-            scopea = 2
-        """.trimIndent()
-        val parser = Parser(input)
-        println(parser.statements())
+    private fun makeTest(input: String, expected: MutableList<Statement>) {
+        val actual = Parser(input).statements()
+        assertEquals(expected, actual)
     }
 }
+
+
