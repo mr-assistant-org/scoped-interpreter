@@ -1,7 +1,6 @@
 import Scoped.Companion.scoped
-import ast.Scope
 import ast.Statement
-import interpreter.Evaluator
+import interpreter.Interpreter
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -83,7 +82,7 @@ class InterpreterTest {
     }
 
     private fun makeTest(input: MutableList<Statement>, expected: String) {
-        val actual = Evaluator().interpret(input)
+        val actual = Interpreter().interpret(input)
         assertEquals(expected, actual)
     }
 }

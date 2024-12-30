@@ -2,7 +2,7 @@ package interpreter
 
 import ast.*
 
-class Evaluator {
+class Interpreter {
     private val env = EvalEnvironment()
 
     fun interpret(statements: List<Statement>): String = interpret(Scope(statements))
