@@ -15,11 +15,10 @@ open class Lexer(private val input: CharSequence) {
             return
         }
         Term.entries.forEach { rule ->
-            if (rule in listOf(END, EPS)) return@forEach
-            val match = rule.pattern.matchAt(input, curPos) ?: return@forEach
+            val match = rule.pattern?.matchAt(input, curPos) ?: return@forEach
             curPos += match.range.length()
             curTerminal = TermWithValue(rule, match.value)
-            skipWhitespaces() // TODO Dangerous
+            skipWhitespaces()
             return
         }
         throw LexerException(
