@@ -38,7 +38,7 @@ open class Lexer(private val input: CharSequence) {
         while (curTerminal.terminal == WS) nextToken()
     }
 
-    private fun currentPrefix(length: Int = 15): CharSequence =
+    fun currentPrefix(length: Int = 15): CharSequence =
         input.subSequence(curPos, minOf(curPos + length, input.length))
 
     private fun IntRange.length() = last - first + 1

@@ -6,7 +6,7 @@ import kotlin.test.assertEquals
 
 class InterpreterTest {
     @Test
-    fun varDef() {
+    fun `example from test task`() {
         val input = scoped {
             "x" -= 1
             print("x")
@@ -39,7 +39,7 @@ class InterpreterTest {
     }
 
     @Test
-    fun nullVars() {
+    fun `initialized variables are null`() {
         val input = scoped {
             "x" -= "x"
             print("x")
@@ -63,12 +63,19 @@ class InterpreterTest {
             "x" -= 1
             scope {
                 "x" -= 2
+                scope {
+                    "x" -= 4
+                    print("x")
+                }
                 "y" -= 3
+                print("x")
             }
             print("x")
             print("y")
         }
         val expected = """
+            4
+            2
             1
             null
             
