@@ -1,7 +1,7 @@
 
 package interpreter
 
-class EvalEnvironment {
+class InterpreterEnvironment {
     private val scopes: ArrayDeque<MutableMap<String, Int?>> = ArrayDeque(listOf())
 
     fun enterScope() = scopes.addLast(mutableMapOf())
