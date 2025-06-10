@@ -1,3 +1,4 @@
+import Scoped.Companion.scoped
 import ast.Statement
 import parser.Parser
 import kotlin.test.Test
@@ -5,7 +6,7 @@ import kotlin.test.assertEquals
 
 class ParserTest {
     @Test
-    fun varDef() {
+    fun `variable definition`() {
         val input = """
             x = 2
         """.trimIndent()
@@ -16,7 +17,7 @@ class ParserTest {
     }
 
     @Test
-    fun printVar() {
+    fun `print variable`() {
         val input = """
             print x
         """.trimIndent()
@@ -27,7 +28,7 @@ class ParserTest {
     }
 
     @Test
-    fun printInt() {
+    fun `print integer`() {
         val input = """
             print 2
         """.trimIndent()
@@ -38,7 +39,7 @@ class ParserTest {
     }
 
     @Test
-    fun severalStatements() {
+    fun `several statements`() {
         val input = """
             print 1
             x = 2
@@ -70,7 +71,7 @@ class ParserTest {
     }
 
     @Test
-    fun nestedScopes() {
+    fun `nested scopes`() {
         val input = """
             x = 1
             scope {
@@ -115,7 +116,7 @@ class ParserTest {
     }
 
     @Test
-    fun complex() {
+    fun `example from test task`() {
         val input = """
             x = 1
             print x
@@ -154,7 +155,7 @@ class ParserTest {
     }
 
     @Test
-    fun variableNames() {
+    fun `complex variables names`() {
         val input = """
             xxx = 1
             jjads_jio = 2
@@ -172,6 +173,80 @@ class ParserTest {
             "sscope" -= 5
             "scopeL" -= 2
             "println" -= 2
+        }
+        makeTest(input, expected)
+    }
+
+    @Test
+    fun `complex variables values`() {
+        val input = """
+            x = 12312523
+            y = -6567567
+            z = 0
+        """.trimIndent()
+        val expected = scoped {
+            "x" -= 12312523
+            "y" -= -6567567
+            "z" -= 0
+        }
+        makeTest(input, expected)
+    }
+
+    @Test
+    fun `statements can be separated with any whitespace`() {
+        val input = """
+            x = 1 y = 3 ${"\t"} print y 
+                scope { print x } z = 56 print z
+        """.trimIndent()
+        val expected = scoped {
+            "x" -= 1
+            "y" -= 3
+            print("y")
+            scope {
+                print("x")
+            }
+            "z" -= 56
+            print("z")
+        }
+        makeTest(input, expected)
+    }
+
+    @Test
+    fun `inconsistent whitespaces`() {
+        val input = """
+            x=2
+            x=-2
+            y            =         3
+            z
+            ${"\r"}
+            =
+            
+                34
+                print    
+                    x
+            scope{print 2}
+            scope
+            
+            {
+            z = 3
+            
+            print z}
+            scope{scope {}}
+        """.trimIndent()
+        val expected = scoped {
+            "x" -= 2
+            "x" -= -2
+            "y" -= 3
+            "z" -= 34
+            print("x")
+            scope {
+                print(2)
+            }
+            scope {
+                "z" -= 3
+                print("z")
+            }
+            scope { scope {} }
         }
         makeTest(input, expected)
     }

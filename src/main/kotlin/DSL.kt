@@ -6,7 +6,7 @@ import ast.VarDef
 import ast.VarExpr
 
 class Scoped {
-    val statements = mutableListOf<Statement>()
+    private val statements = mutableListOf<Statement>()
 
     fun scope(block: Scoped.() -> Unit) {
         statements += Scope(Scoped().apply(block).statements)
@@ -27,6 +27,9 @@ class Scoped {
     fun print(name: String) {
         statements += Print(VarExpr(name))
     }
+
+    companion object {
+        fun scoped(block: Scoped.() -> Unit) = Scoped().also(block).statements
+    }
 }
 
-fun scoped(block: Scoped.() -> Unit) = Scoped().also(block).statements
