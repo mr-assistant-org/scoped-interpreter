@@ -1,3 +1,4 @@
+
 import Scoped.Companion.scoped
 import ast.Statement
 import interpreter.Interpreter
@@ -80,11 +81,33 @@ class InterpreterTest {
         """.trimIndent()
         makeTest(input, expected)
     }
+    
+    @Test
+    fun `negative numbers interpretation`() {
+        val input = scoped {
+            "x" -= -5
+            print("x")
+            "y" -= -10
+            print("y")
+            scope {
+                "z" -= -15
+                print("z")
+                "x" -= "y"
+                print("x")
+            }
+        }
+        val expected = """
+            -5
+            -10
+            -15
+            -10
+            
+        """.trimIndent()
+        makeTest(input, expected)
+    }
 
     private fun makeTest(input: MutableList<Statement>, expected: String) {
         val actual = Interpreter().interpret(input)
         assertEquals(expected, actual)
     }
 }
-
-
