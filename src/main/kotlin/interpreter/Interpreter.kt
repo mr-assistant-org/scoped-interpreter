@@ -1,9 +1,10 @@
+
 package interpreter
 
 import ast.*
 
 class Interpreter {
-    private val env = EvalEnvironment()
+    private val env = InterpreterEnvironment()
 
     fun interpret(statements: List<Statement>): String = interpret(Scope(statements))
 
