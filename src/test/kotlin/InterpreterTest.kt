@@ -80,8 +80,27 @@ class InterpreterTest {
         """.trimIndent()
         makeTest(input, expected)
     }
-
-    private fun makeTest(input: MutableList<Statement>, expected: String) {
+@Test
+    fun `negative numbers interpretation`() {
+        val input = scoped {
+            "x" -= -5
+            "y" -= -10
+            "z" -= "x"
+            "sum" -= 3
+            print("x")
+            print("y")
+            print("z")
+            print("sum")
+        }
+        val expected = """
+            -5
+            -10
+            -5
+            3
+            
+        """.trimIndent()
+        makeTest(input, expected)
+    }
         val actual = Interpreter().interpret(input)
         assertEquals(expected, actual)
     }
